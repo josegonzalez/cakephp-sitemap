@@ -7,9 +7,16 @@
  * @link http://josediazgonzalez/code/sitemaphelper/
  * @package app
  * @subpackage app.views.helpers
- * @version .4
+ * @version .5
  */
 class SitemapHelper extends AppHelper {
+
+/**
+ * Is this index a sitemap
+ *
+ * @var string
+ **/
+	var $sitemap = false;
 
 /**
  * Uses the XML helper to return the proper header
@@ -45,6 +52,7 @@ class SitemapHelper extends AppHelper {
 		if ($index) {
 			$options['url'] = 'http://www.sitemaps.org/schemas/sitemap/0.9/siteindex.xsd';
 			$openTag = "sitemapindex";
+			$this->sitemap = true;
 		}
 		foreach ($options['extensions'] as $extension){
 			$options['allExtensions'] .= "xmlns=\"{$extension} ";
@@ -58,12 +66,11 @@ class SitemapHelper extends AppHelper {
 /**
  * Closes index tag
  *
- * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
  * @return string Closing tag
  * @author Jose Diaz-Gonzalez
  **/
-	function closeIndex($index = false){
-		if ($index) {
+	function closeIndex(){
+		if ($this->sitemap) {
 			return "</sitemapindex>";
 		}
 		return "</urlset>";
@@ -72,12 +79,11 @@ class SitemapHelper extends AppHelper {
 /**
  * Creates an item for the sitemap or sitemap index
  *
- * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
  * @param array $options various options pertaining to the item
  * @return string The item
  * @author Jose Diaz-Gonzalez
  **/
-	function item($index = false, $options = array()) {
+	function item($options = array()) {
 		$options = array_merge(array(
 			'loc' => NULL,
 			'lastmod' => NULL,
@@ -95,7 +101,7 @@ class SitemapHelper extends AppHelper {
 			if ($options['encode']){
 				$options['loc'] = $this->_xmlspecialchars($options['loc']);
 			}
-			if ($index) {
+			if ($this->sitemap) {
 				//Construct a sitemapindex item
 				$item = array();
 				$item['openEntity'] = "<sitemap>";
