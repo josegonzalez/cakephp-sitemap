@@ -10,13 +10,13 @@
  * @version .4
  */
 class SitemapHelper extends AppHelper {
-	
-	/**
-	 * Uses the XML helper to return the proper header
-	 *
-	 * @return string XML header
-	 * @author Jose Diaz-Gonzalez
-	 **/
+
+/**
+ * Uses the XML helper to return the proper header
+ *
+ * @return string XML header
+ * @author Jose Diaz-Gonzalez
+ **/
 	function header() {
 		App::import('Core', 'Helper'); 
 		App::import('Helper', 'Xml');
@@ -24,14 +24,14 @@ class SitemapHelper extends AppHelper {
 		return $xml->header();
 	}
 
-	/**
-	 * Opens the index tag
-	 *
-	 * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
-	 * @param array $options various options pertaining to the schema, including an array of schema extensions
-	 * @return string opening urlset entity
-	 * @author Jose Diaz-Gonzalez
-	 **/
+/**
+ * Opens the index tag
+ *
+ * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
+ * @param array $options various options pertaining to the schema, including an array of schema extensions
+ * @return string opening urlset entity
+ * @author Jose Diaz-Gonzalez
+ **/
 	function openIndex($index = false, $options = array()) {
 		$options = array_merge(array(
 			'xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
@@ -47,22 +47,21 @@ class SitemapHelper extends AppHelper {
 			$openTag = "sitemapindex";
 		}
 		foreach ($options['extensions'] as $extension){
-			$options['allExtensions'] .= "xmlns=\"$extension ";
+			$options['allExtensions'] .= "xmlns=\"{$extension} ";
 		}
-		return "<$openTag xmlns:xsi=\"" . $options['xsi'] . ""\"
-			xsi:schemaLocation=\"" . $options['schemaLocation'] . "\"
-			url=\"" . $options['url'] . "\"
-			xmlns=\"" . $options['xmlns'] . "\"" .
-			$options['allExtensions'] . ">";
+		return "<{$openTag} xmlns:xsi=\"{$options['xsi']}"\"
+			xsi:schemaLocation=\"{$options['schemaLocation']}\"
+			url=\"{$options['url']}\" xmlns=\"{$options['xmlns']}\"
+			{$options['allExtensions']}>";
 	}
 
-	/**
-	 * Closes index tag
-	 *
-	 * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
-	 * @return string Closing tag
-	 * @author Jose Diaz-Gonzalez
-	 **/
+/**
+ * Closes index tag
+ *
+ * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
+ * @return string Closing tag
+ * @author Jose Diaz-Gonzalez
+ **/
 	function closeIndex($index = false){
 		if ($index) {
 			return "</sitemapindex>";
@@ -70,14 +69,14 @@ class SitemapHelper extends AppHelper {
 		return "</urlset>";
 	}
 	
-	/**
-	 * Creates an item for the sitemap or sitemap index
-	 *
-	 * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
-	 * @param array $options various options pertaining to the item
-	 * @return string The item
-	 * @author Jose Diaz-Gonzalez
-	 **/
+/**
+ * Creates an item for the sitemap or sitemap index
+ *
+ * @param boolean $index set to false if this item is not for a sitemap index, true otherwise
+ * @param array $options various options pertaining to the item
+ * @return string The item
+ * @author Jose Diaz-Gonzalez
+ **/
 	function item($index = false, $options = array()) {
 		$options = array_merge(array(
 			'loc' => NULL,
@@ -121,7 +120,7 @@ class SitemapHelper extends AppHelper {
 	
 	function _entityMaker($entity = NULL, $string = NULL) {
 		if (!empty($string)){
-			return "<$entity>$string</$entity>";
+			return "<{$entity}>{$string}</{$entity}>";
 		}
 	}
 	
