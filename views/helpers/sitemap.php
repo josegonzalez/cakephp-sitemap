@@ -57,7 +57,7 @@ class SitemapHelper extends AppHelper {
 		foreach ($options['extensions'] as $extension){
 			$options['allExtensions'] .= "xmlns=\"{$extension} ";
 		}
-		return "<{$openTag} xmlns:xsi=\"{$options['xsi']}"\"
+		return "<{$openTag} xmlns:xsi=\"{$options['xsi']}\"
 			xsi:schemaLocation=\"{$options['schemaLocation']}\"
 			url=\"{$options['url']}\" xmlns=\"{$options['xmlns']}\"
 			{$options['allExtensions']}>";
