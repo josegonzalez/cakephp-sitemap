@@ -3,12 +3,16 @@
  * Allows one to easily build a sitemap
  *
  * @author Jose Diaz-Gonzalez
- * @license	http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link http://josediazgonzalez/code/sitemaphelper/
  * @package app
  * @subpackage app.views.helpers
- * @version .5
+ * @version 0.5.1
  */
+App::import('Core', 'Helper');
+App::import('Helper', 'Xml');
+App::import('Helper', 'Time');
+
 class SitemapHelper extends AppHelper {
 
 /**
@@ -16,7 +20,7 @@ class SitemapHelper extends AppHelper {
  *
  * @var string
  **/
-	var $sitemap = false;
+	public $sitemap = false;
 
 /**
  * Uses the XML helper to return the proper header
@@ -24,11 +28,9 @@ class SitemapHelper extends AppHelper {
  * @return string XML header
  * @author Jose Diaz-Gonzalez
  **/
-	function header() {
-		App::import('Core', 'Helper'); 
-		App::import('Helper', 'Xml');
+	public function header() {
 		$xml  = new XmlHelper();
-		return $xml->header();
+		return $xml->header() . "\n";
 	}
 
 /**
@@ -39,7 +41,7 @@ class SitemapHelper extends AppHelper {
  * @return string opening urlset entity
  * @author Jose Diaz-Gonzalez
  **/
-	function openIndex($index = false, $options = array()) {
+	public function openIndex($index = false, $options = array()) {
 		$options = array_merge(array(
 			'xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
 			'schemaLocation' => 'http://www.sitemaps.org/schemas/sitemap/0.9',
@@ -57,10 +59,10 @@ class SitemapHelper extends AppHelper {
 		foreach ($options['extensions'] as $extension){
 			$options['allExtensions'] .= "xmlns=\"{$extension} ";
 		}
-		return "<{$openTag} xmlns:xsi=\"{$options['xsi']}\"
-			xsi:schemaLocation=\"{$options['schemaLocation']}\"
-			url=\"{$options['url']}\" xmlns=\"{$options['xmlns']}\"
-			{$options['allExtensions']}>";
+		return "<{$openTag} xmlns:xsi=\"{$options['xsi']}\" " .
+			"xsi:schemaLocation=\"{$options['schemaLocation']}\" " .
+			"url=\"{$options['url']}\" xmlns=\"{$options['xmlns']}\" " .
+			"{$options['allExtensions']}>\n";
 	}
 
 /**
@@ -69,13 +71,13 @@ class SitemapHelper extends AppHelper {
  * @return string Closing tag
  * @author Jose Diaz-Gonzalez
  **/
-	function closeIndex(){
+	public function closeIndex() {
 		if ($this->sitemap) {
 			return "</sitemapindex>";
 		}
 		return "</urlset>";
 	}
-	
+
 /**
  * Creates an item for the sitemap or sitemap index
  *
@@ -83,7 +85,7 @@ class SitemapHelper extends AppHelper {
  * @return string The item
  * @author Jose Diaz-Gonzalez
  **/
-	function item($options = array()) {
+	public function item($options = array()) {
 		$options = array_merge(array(
 			'loc' => NULL,
 			'lastmod' => NULL,
@@ -92,53 +94,51 @@ class SitemapHelper extends AppHelper {
 			'encode' => true
 			), $options);
 		if (!empty($options['loc'])) {
-			if (!empty($item['lastmod'])) {
-				App::import('Core', 'Helper'); 
-				App::import('Helper', 'Time');
+			if (!empty($options['lastmod'])) {
 				$time  = new TimeHelper();
 				$options['lastmod'] = $time->toAtom($options['lastmod']);
 			}
-			if ($options['encode']){
+			if ($options['encode']) {
 				$options['loc'] = $this->_xmlspecialchars($options['loc']);
 			}
 			if ($this->sitemap) {
 				//Construct a sitemapindex item
 				$item = array();
 				$item['openEntity'] = "<sitemap>";
-				$item['loc'] = $this->entityMaker("loc", $options['loc']);
+				$item['loc'] = $this->_entityMaker("loc", $options['loc']);
 				$item['lastmod'] = $this->_entityMaker("lastmod", $options['lastmod']);
-				$item['closeEntity'] = "</sitemap>";
+				$item['closeEntity'] = "</sitemap>\n";
 				return $this->_mergeArrayEntities($item);
 			} else {
 				//Construct a sitemap item
 				$item = array();
 				$item['openEntity'] = "<url>";
-				$item['loc'] = $this->entityMaker("loc", $options['loc']);
-				$item['lastmod'] = $this->entityMaker("lastmod", $options['lastmod']);
-				$item['changefreq'] = $this->entityMaker("changefreq", $options['lastmod']);
-				$item['priority'] = $this->entityMaker("priority", $options['lastmod']);
-				$item['closeEntity'] = "</url>";
+				$item['loc'] = $this->_entityMaker("loc", $options['loc']);
+				$item['lastmod'] = $this->_entityMaker("lastmod", $options['lastmod']);
+				$item['changefreq'] = $this->_entityMaker("changefreq", $options['changefreq']);
+				$item['priority'] = $this->_entityMaker("priority", $options['priority']);
+				$item['closeEntity'] = "</url>\n";
 				return $this->_mergeArrayEntities($item);
 			}
 		}
 		return false;
 	}
-	
-	function _entityMaker($entity = NULL, $string = NULL) {
+
+	private function _entityMaker($entity = NULL, $string = NULL) {
 		if (!empty($string)){
-			return "<{$entity}>{$string}</{$entity}>";
+			return "<{$entity}>{$string}</{$entity}>\n";
 		}
 	}
-	
-	function _mergeArrayEntities($entityArray = array()) {
+
+	private function _mergeArrayEntities($entityArray = array()) {
 		$mergedArray = '';
 		foreach ($entityArray as $entity) {
 			$mergedArray .= $entity;
 		}
 		return $mergedArray;
 	}
-	
-	function _xmlspecialchars($text) {
+
+	private function _xmlspecialchars($text) {
 	   return str_replace('&#039;', '&apos;', htmlspecialchars($text, ENT_QUOTES));
 	}
 }
